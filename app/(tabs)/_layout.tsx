@@ -37,6 +37,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="oona"
+        options={{
+          title: 'Oona',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'person' : 'person-outline'} color={color} size={24}/>
+          ),
+        }}
+      />
     </Tabs>
   );
 }

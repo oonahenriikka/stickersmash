@@ -11,6 +11,7 @@ export default function EmojiSticker({ imageSize, stickerSource }: Props) {
   const scaleImage = useSharedValue(imageSize);
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+  const rotateZ = useSharedValue(0); 
 
   const doubleTap = Gesture.Tap()
     .numberOfTaps(2)
@@ -22,6 +23,20 @@ export default function EmojiSticker({ imageSize, stickerSource }: Props) {
       }
     });
 
+  const drag = Gesture.Pan()
+    .onChange(event => {
+      translateX.value += event.changeX;
+      translateY.value += event.changeY;
+    });
+
+  const rotation = Gesture.Rotation()
+    .onChange(event => {
+      rotateZ.value = event.rotation; 
+    });
+
+  
+  const composedGesture = Gesture.Simultaneous(drag, rotation);
+
   const imageStyle = useAnimatedStyle(() => {
     return {
       width: withSpring(scaleImage.value),
@@ -29,26 +44,18 @@ export default function EmojiSticker({ imageSize, stickerSource }: Props) {
     };
   });
 
-  const drag = Gesture.Pan().onChange(event => {
-    translateX.value += event.changeX;
-    translateY.value += event.changeY;
-  });
-
   const containerStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        {
-          translateX: translateX.value,
-        },
-        {
-          translateY: translateY.value,
-        },
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+        { rotateZ: `${rotateZ.value}rad` }, 
       ],
     };
   });
 
   return (
-    <GestureDetector gesture={drag}>
+    <GestureDetector gesture={composedGesture}>
       <Animated.View style={[containerStyle, { top: -350 }]}>
         <GestureDetector gesture={doubleTap}>
           <Animated.Image
